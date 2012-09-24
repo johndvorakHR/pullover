@@ -1,0 +1,22 @@
+{
+  "name": "pullover",
+  "version": "0.0.0",
+  "description": "Pull git repos. A counterpart to pushover.",
+  "main": "index.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "tests-of-the-sierra-madre && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jesusabdullah/pullover.git"
+  },
+  "keywords": [
+    "git",
+    "pull"
+  ],
+  "author": "Joshua Holbrook",
+  "license": "MIT/X11"
+}
