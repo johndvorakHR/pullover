@@ -32,7 +32,9 @@ var Pullover = module.exports = function (repoDir, opts) {
 
   // same as pushover
   this.autoCreate = opts.autoCreate === false ? false : true;
-  this.checkout = opts.checkout;
+
+  // not the same.
+  this.checkout = true;
 
   // easiest not to attempt reuse.
   this.pushover = pushover(this.repoDir, {
@@ -72,9 +74,9 @@ Pullover.prototype.pull = function (remote, repo, cb) {
     return cb(new Error('invalid repo name'));
   }
 
-  fs.stat(path.join(this.repoDir, repo),  function (err, stat) {
+  fs.stat(path.join(this.repoDir, repo + '.git'),  function (err, stat) {
     if (err && self.autoCreate) {
-      return pushover.mkdir(repo, next);
+      return pushover.create(repo, next);
     }
     next(err);
   });
@@ -82,12 +84,13 @@ Pullover.prototype.pull = function (remote, repo, cb) {
   function next (err) {
     if (err) {
       return cb(err);
-    }  
+    } 
 
     var dir = path.join(self.repoDir, repo);
+    console.log(dir);
     // TODO: custom pull args
     var ps = spawn('git', [ 'pull', remote ], {
-      cwd: path.join(self.repoDir, repo)
+      cwd: dir
     });
         
     var err = [];
@@ -96,8 +99,9 @@ Pullover.prototype.pull = function (remote, repo, cb) {
     });
         
     onexit(ps, function (code) {
+      err = err.join('');
       if (code) {
-        return cb(err || new Error(util.format('`git` exit code %d', code)));
+        return cb(new Error(err || util.format('`git` exit code %d', code)));
       }
       cb(null);
     });
