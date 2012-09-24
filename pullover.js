@@ -46,18 +46,15 @@ util.inherits(Pullover, EventEmitter);
 Pullover.prototype.pull = function (remote, repo, cb) {
   // A good chunk of this is adopted from pushover().create
   var self = this,
-      pushover = this.pushover,
-      cwd = process.cwd();
-
-  console.log(remote.repository);
+      pushover = this.pushover;
 
   if (typeof cb === 'undefined') {
     if (typeof repo === 'function') {
       // Infer these things from the github-style hook payload
       if (remote && remote.repository && remote.repository.url) {
         cb = repo;
+        repo = url.parse(remote.repository.url).path.substr(1);
         remote = remote.repository.url + '.git';
-        repo = url.parse(remote.repository.url).path;
       }
       else {
         throw new Error(
@@ -90,7 +87,7 @@ Pullover.prototype.pull = function (remote, repo, cb) {
     var dir = path.join(self.repoDir, repo);
     // TODO: custom pull args
     var ps = spawn('git', [ 'pull', remote ], {
-      cwd: cwd
+      cwd: path.join(self.repoDir, repo)
     });
         
     var err = [];
