@@ -18,5 +18,12 @@
     "pull"
   ],
   "author": "Joshua Holbrook",
-  "license": "MIT/X11"
+  "license": "MIT/X11",
+  "dependencies": {
+    "pushover": "1.0.x"
+  },
+  "devDependencies": {
+    "tests-of-the-sierra-madre": "*",
+    "hubhook": "*"
+  }
 }
