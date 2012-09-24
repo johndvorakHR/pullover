@@ -17,7 +17,7 @@ var Pullover = module.exports = function (repoDir, opts) {
   if (typeof opts === 'undefined') {
     if (typeof repoDir === 'string') {
       opts = {
-        repoDir, repoDir
+        repoDir: repoDir
       };
     }
     else {
@@ -36,8 +36,8 @@ var Pullover = module.exports = function (repoDir, opts) {
 
   // easiest not to attempt reuse.
   this.pushover = pushover(this.repoDir, {
-    this.autoCreate,
-    this.checkout
+    autoCreate: this.autoCreate,
+    checkout: this.checkout
   });
 
 };
@@ -49,13 +49,15 @@ Pullover.prototype.pull = function (remote, repo, cb) {
       pushover = this.pushover,
       cwd = process.cwd();
 
+  console.log(remote.repository);
+
   if (typeof cb === 'undefined') {
     if (typeof repo === 'function') {
       // Infer these things from the github-style hook payload
-      if (remote.repository.url) {
+      if (remote && remote.repository && remote.repository.url) {
         cb = repo;
-        repo = remote.repository.url + '.git';
-        remote = url.parse(remote.repository.url).path;
+        remote = remote.repository.url + '.git';
+        repo = url.parse(remote.repository.url).path;
       }
       else {
         throw new Error(
@@ -87,7 +89,7 @@ Pullover.prototype.pull = function (remote, repo, cb) {
 
     var dir = path.join(self.repoDir, repo);
     // TODO: custom pull args
-    spawn('git', [ 'pull', remote ], {
+    var ps = spawn('git', [ 'pull', remote ], {
       cwd: cwd
     });
         
