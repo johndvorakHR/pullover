@@ -63,6 +63,7 @@ configuration (minus checkout).
 
 Pull from `remoteUrl` repository and store in `repoName`. Optionally get a
 callback `cb(err)` to be notified when the repository is done being pulled.
+Pulls from master by default. (perhaps change to a git fetch?)
 
 Optionally, pass in a
 [github-style "payload" object](https://help.github.com/articles/post-receive-hooks)
