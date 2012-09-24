@@ -62,7 +62,7 @@ configuration (minus checkout).
 ### p.pull(payload)
 
 Pull from `remoteUrl` repository and store in `repoName`. Optionally get a
-callback `cb(err)` to be notified when the repository was created.
+callback `cb(err)` to be notified when the repository is done being pulled.
 
 Optionally, pass in a
 [github-style "payload" object](https://help.github.com/articles/post-receive-hooks)
