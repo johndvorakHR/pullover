@@ -58,12 +58,12 @@ until someone figures out the "pull" alternative for bare repos for me.
 pullover can also accept a pushover, in which case it uses the same
 configuration (minus checkout).
 
-### p.pull(remoteUrl, repoName, <cb>)
+### p.pull(remoteUrl, repoName, <branch>, <cb>)
 ### p.pull(payload)
 
 Pull from `remoteUrl` repository and store in `repoName`. Optionally get a
 callback `cb(err)` to be notified when the repository is done being pulled.
-Pulls from master by default. (perhaps change to a git fetch?)
+Pulls from master by default.
 
 Optionally, pass in a
 [github-style "payload" object](https://help.github.com/articles/post-receive-hooks)
