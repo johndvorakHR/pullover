@@ -45,38 +45,36 @@ var Pullover = module.exports = function (repoDir, opts) {
 };
 util.inherits(Pullover, EventEmitter);
 
-Pullover.prototype.pull = function (remote, repo, cb) {
+Pullover.prototype.pull = function (opts, cb) {
   // A good chunk of this is adopted from pushover().create
   var self = this,
       pushover = this.pushover;
 
-  if (typeof cb === 'undefined') {
-    if (typeof repo === 'function') {
-      // Infer these things from the github-style hook payload
-      if (remote && remote.repository && remote.repository.url) {
-        cb = repo;
-        repo = url.parse(remote.repository.url).path.substr(1);
-        remote = remote.repository.url + '.git';
-      }
-      else {
-        throw new Error(
-          'you need to define either `remote.repository.url` or ' +
-          'both remote and repo'
-        );
-      }
-    }
-    else {
-      cb = function () {};
-    }
+  if (!opts
+      || typeof opts === 'function'
+      || !opts.repository && (!opts.repo || !opts.remote)) {
+    throw new Error(
+      'you need to define either `remote.repository.url` or ' +
+      'both remote and repo'
+    );
+  };
+
+  // github-style hook payload
+  if (opts.repository && opts.repository.url) {
+    opts.repo = url.parse(opts.repository.url).path.substr(1);
+    opts.remote = opts.repository.url + '.git';
   }
 
-  if (/\.\.|^\//.test(repo)) {
+  if (!opts.branch) opts.branch = 'master';
+  if (!cb) cb = function () {};
+
+  if (/\.\.|^\//.test(opts.repo)) {
     return cb(new Error('invalid repo name'));
   }
 
-  fs.stat(path.join(this.repoDir, repo + '.git'),  function (err, stat) {
+  fs.stat(path.join(this.repoDir, opts.repo + '.git'),  function (err, stat) {
     if (err && self.autoCreate) {
-      return pushover.create(repo, next);
+      return pushover.create(opts.repo, next);
     }
     next(err);
   });
@@ -86,10 +84,18 @@ Pullover.prototype.pull = function (remote, repo, cb) {
       return cb(err);
     } 
 
-    var dir = path.join(self.repoDir, repo);
-    console.log(dir);
-    // TODO: custom pull args
-    var ps = spawn('git', [ 'pull', remote ], {
+    git([ 'remote', 'add', 'origin', opts.remote ], function (_) {
+      // ignore the error since the origin might already exist
+      git([ 'fetch', 'origin' ], function (err) {
+        if (err) return cb(err);
+        git([ 'reset', '--hard', 'origin/' + opts.branch ], cb);
+      });
+    });
+  }
+
+  function git (cmd, cb) {
+    var dir = path.join(self.repoDir, opts.repo);
+    var ps = spawn('git', cmd, {
       cwd: dir
     });
         
@@ -97,7 +103,7 @@ Pullover.prototype.pull = function (remote, repo, cb) {
     ps.stderr.on('data', function (data) {
       err.push(data.toString());
     });
-        
+
     onexit(ps, function (code) {
       err = err.join('');
       if (code) {
