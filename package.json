@@ -1,6 +1,6 @@
 {
   "name": "pullover",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Pull git repos. A counterpart to pushover.",
   "main": "index.js",
   "directories": {
